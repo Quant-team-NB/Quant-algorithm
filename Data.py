@@ -55,6 +55,7 @@ def get_prices(ticker, authtoken, from_date=None, time_series_id="1W_adj", outpu
 
 	# Creating dataframe
 	df_price = pd.DataFrame(price_data).transpose()
+	df_price = df_price.apply(pd.to_numeric)
 
 	# Filtering out data prior to from_date
 	if not from_date == None:
