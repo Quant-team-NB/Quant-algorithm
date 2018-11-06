@@ -1,6 +1,7 @@
 import pandas as pd
 import urllib.request, json
 import sys, os, ssl
+import time
 
 def get_prices(ticker, authtoken, from_date=None, time_series_id="1W_adj", outputsize="compact"): 
 
@@ -49,9 +50,18 @@ def get_prices(ticker, authtoken, from_date=None, time_series_id="1W_adj", outpu
 
 
 	# Opening and formatting data
-	with urllib.request.urlopen(api_url) as url:
-	    price_data = json.loads(url.read().decode())
-	    price_data = price_data[time_series_settings[time_series_id][1]] 
+	data_received = False
+	while not (data_received):
+		try:
+			with urllib.request.urlopen(api_url) as url:
+				price_data = json.loads(url.read().decode())
+				price_data = price_data[time_series_settings[time_series_id][1]]
+				data_received = True
+		except KeyError:
+			print("Can't get API data. Pausing system 20 sec")
+			time.sleep(20)
+			print("Continuing")
+
 
 	# Creating dataframe
 	df_price = pd.DataFrame(price_data).transpose()
